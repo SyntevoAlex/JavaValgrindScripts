@@ -1,0 +1,84 @@
+{
+   <GLib g_intern_string>
+   Memcheck:Leak
+   ...
+   fun:g_intern_string
+}
+{
+   <GLib g_type_add_interface_static>
+   Memcheck:Leak
+   ...
+   fun:g_type_add_interface_static
+}
+{
+   <GLib g_type_register_static>
+   Memcheck:Leak
+   ...
+   fun:g_type_register_static
+}
+{
+   <GTK gtk_css_provider_load_from_path>
+   Memcheck:Leak
+   ...
+   fun:gtk_css_provider_load_from_path
+}
+{
+   <GTK gtk_css_provider_load_internal>
+   Memcheck:Leak
+   ...
+   fun:gtk_css_provider_load_internal
+}
+{
+   <GTK gtk_im_module_initialize>
+   Memcheck:Leak
+   ...
+   fun:gtk_im_module_initialize
+}
+{
+   <GTK gtk_init_check>
+   Memcheck:Leak
+   ...
+   fun:gtk_init_check
+}
+{
+   <GTK gtk_test_register_all_types>
+   Memcheck:Leak
+   ...
+   fun:gtk_test_register_all_types
+}
+{
+   <GTK gtk_*_class_init>
+   Memcheck:Leak
+   ...
+   fun:gtk_*_class_init
+}
+{
+   <Libfontconfg FcConfigEnsure>
+   Memcheck:Leak
+   ...
+   fun:FcConfigEnsure
+}
+{
+   <Pango _pango_cairo_font_private_get_glyph_extents_cache_entry>
+   Memcheck:Leak
+   ...
+   fun:_pango_cairo_font_private_get_glyph_extents_cache_entry
+}
+{
+   <RSVG call_once<closure-0>>
+   Memcheck:Leak
+   ...
+   fun:call_once<closure-0>
+}
+{
+   <RSVG call_once<closure-0,()>>
+   Memcheck:Leak
+   ...
+   fun:call_once<closure-0,()>
+}
+{
+   <XLib _XEnq>
+   Memcheck:Leak
+   fun:malloc
+   fun:_XEnq
+}

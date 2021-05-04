@@ -1,0 +1,213 @@
+{
+   <JVM AdapterHandlerLibrary::new_entry>
+   Memcheck:Leak
+   ...
+   fun:_ZN21AdapterHandlerLibrary9new_entryEP18AdapterFingerPrintPhS2_S2_
+}
+{
+   <JVM Arena::grow>
+   Memcheck:Leak
+   ...
+   fun:_ZN5Arena4growEmN17AllocFailStrategy13AllocFailEnumE
+}
+{
+   <JVM CompileBroker::compiler_thread_loop>
+   Memcheck:Leak
+   ...
+   fun:_ZN13CompileBroker20compiler_thread_loopEv
+}
+{
+   <JVM Compiler::compile_method>
+   Memcheck:Leak
+   ...
+   fun:_ZN8Compiler14compile_methodEP5ciEnvP8ciMethodiP12DirectiveSet
+}
+{
+   <JVM C2Compiler::compile_method>
+   Memcheck:Leak
+   ...
+   fun:_ZN10C2Compiler14compile_methodEP5ciEnvP8ciMethodiP12DirectiveSet
+}
+{
+   <JVM Deoptimization::fetch_unroll_info>
+   Memcheck:Leak
+   ...
+   fun:_ZN14Deoptimization17fetch_unroll_infoEP10JavaThreadi
+}
+{
+   <JVM G1CollectedHeap>
+   Memcheck:Leak
+   ...
+   fun:_ZN15G1CollectedHeapC1EP17G1CollectorPolicy
+   fun:create_heap_with_policy<G1CollectedHeap, G1CollectorPolicy>
+}
+{
+   <JVM G1CollectedHeap::initialize>
+   Memcheck:Leak
+   ...
+   fun:_ZN15G1CollectedHeap10initializeEv
+}
+{
+   <JVM G1CollectedHeap::new_heap_region>
+   Memcheck:Leak
+   ...
+   fun:_ZN15G1CollectedHeap15new_heap_regionEj9MemRegion
+}
+{
+   <JVM G1ConcurrentMark>
+   Memcheck:Leak
+   ...
+   fun:_ZN16G1ConcurrentMarkC1EP15G1CollectedHeapP21G1RegionToSpaceMapperS3_
+   fun:_ZN15G1CollectedHeap10initializeEv
+}
+{
+   <JVM HeapRegion>
+   Memcheck:Leak
+   ...
+   fun:_ZN10HeapRegionC1EjP18G1BlockOffsetTable9MemRegion
+   fun:_ZN15G1CollectedHeap15new_heap_regionEj9MemRegion
+}
+{
+   <JVM Java_java_lang_ClassLoader_defineClass1>
+   Memcheck:Leak
+   ...
+   fun:Java_java_lang_ClassLoader_defineClass1
+}
+{
+   <JVM Java_java_util_zip_Inflater_inflateBytesBytes>
+   Memcheck:Leak
+   ...
+   fun:Java_java_util_zip_Inflater_inflateBytesBytes
+}
+{
+   <JVM Java_java_util_zip_Inflater_init>
+   Memcheck:Leak
+   ...
+   fun:Java_java_util_zip_Inflater_init
+}
+{
+   <JVM JVM_AddModuleExports>
+   Memcheck:Leak
+   ...
+   fun:JVM_AddModuleExports
+}
+{
+   <JVM JVM_AddReadsModule>
+   Memcheck:Leak
+   ...
+   fun:JVM_AddReadsModule
+}
+{
+   <JVM JVM_DefineModule>
+   Memcheck:Leak
+   ...
+   fun:JVM_DefineModule
+}
+{
+   <JVM Metaspace::global_initialize>
+   Memcheck:Leak
+   ...
+   fun:_ZN9Metaspace17global_initializeEv
+}
+{
+   <JVM MetaspaceShared::initialize_shared_spaces>
+   Memcheck:Leak
+   ...
+   fun:_ZN15MetaspaceShared24initialize_shared_spacesEv
+}
+{
+   <JVM ObjectSynchronizer::omAlloc>
+   Memcheck:Leak
+   ...
+   fun:_ZN18ObjectSynchronizer7omAllocEP6Thread
+}
+{
+   <JVM OopMapCache::OopMapCache>
+   Memcheck:Leak
+   ...
+   fun:_ZN11OopMapCacheC1Ev
+}
+{
+   <JVM OopMapCache::lookup>
+   Memcheck:Leak
+   ...
+   fun:_ZN11OopMapCache6lookupERK12methodHandleiP17InterpreterOopMap
+}
+{
+   <JVM ResolvedMethodTable::basic_add>
+   Memcheck:Leak
+   ...
+   fun:_ZN19ResolvedMethodTable9basic_addEP6Method6Handle
+}
+{
+   <JVM SymbolPropertyTable::add_entry>
+   Memcheck:Leak
+   ...
+   fun:_ZN19SymbolPropertyTable9add_entryEijP6Symboll
+}
+{
+   <JVM StringTable::StringTable>
+   Memcheck:Leak
+   ...
+   fun:_ZN11StringTableC1Ev
+}
+{
+   <JVM StringTable::intern>
+   Memcheck:Leak
+   ...
+   fun:_ZN11StringTable6internEP6SymbolP6Thread
+}
+{
+   <JVM SymbolTable::initialize_symbols>
+   Memcheck:Leak
+   ...
+   fun:_ZN11SymbolTable18initialize_symbolsEi
+}
+{
+   <JVM SymbolTable::basic_add>
+   Memcheck:Leak
+   ...
+   fun:_ZN11SymbolTable9basic_addEiPhijbP6Thread
+}
+{
+   <JVM SymbolTable::basic_add>
+   Memcheck:Leak
+   ...
+   fun:_ZN11SymbolTable9basic_addEP15ClassLoaderDataRK18constantPoolHandleiPPKcPiS8_PjP6Thread
+}
+{
+   <JVM SystemDictionary::resolve_well_known_classes>
+   Memcheck:Leak
+   ...
+   fun:_ZN16SystemDictionary26resolve_well_known_classesEP6Thread
+}
+{
+   <JVM Threads::create_vm>
+   Memcheck:Leak
+   ...
+   fun:_ZN7Threads9create_vmEP14JavaVMInitArgsPb
+}
+{
+   <JVM Unsafe_DefineAnonymousClass0>
+   Memcheck:Leak
+   ...
+   fun:Unsafe_DefineAnonymousClass0
+}
+{
+   <JVM Unsafe_DefineClass0>
+   Memcheck:Leak
+   ...
+   fun:Unsafe_DefineClass0
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   ...
+   fun:canonicalize_disableintrinsic
+}
+{
+   <GLIBC globals>
+   Memcheck:Leak
+   ...
+   fun:dlopen@@GLIBC_2.2.5
+}
