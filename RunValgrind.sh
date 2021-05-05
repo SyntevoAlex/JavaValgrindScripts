@@ -69,6 +69,9 @@ VALGRIND_ARGS+=(--undef-value-errors=no)
 # ------------------------------------------
 
 # Add all suppression files to avoid the noise caused by 3rd party things
+VALGRIND_ARGS+=(--suppressions="$SCRIPT_DIR/Suppressions/3rd_party/glib/glib.supp")
+VALGRIND_ARGS+=(--suppressions="$SCRIPT_DIR/Suppressions/3rd_party/gtk/gtk.supp")
+
 for suppressionFile in $SCRIPT_DIR/Suppressions/*.supp
 do
 	VALGRIND_ARGS+=(--suppressions=$suppressionFile)
