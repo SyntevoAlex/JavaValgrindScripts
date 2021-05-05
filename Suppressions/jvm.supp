@@ -10,6 +10,31 @@
    ...
    fun:_ZN5Arena4growEmN17AllocFailStrategy13AllocFailEnumE
 }
+
+# No matter what happens in JVM compiler, it shouldn't be pointing to
+# anything wrong in the application. Just ignore everything.
+# Example stack:
+#   malloc (vg_replace_malloc.c:380)
+#   AllocateHeap (allocation.cpp:44)
+#   AllocateHeap(unsigned long, MemoryType, AllocFailStrategy::AllocFailEnum) (allocation.cpp:54)
+#   operator new (allocation.hpp:177)
+#   CompileTask::allocate() (compileTask.cpp:49)
+#   create_compile_task (compileBroker.cpp:1541)
+#   CompileBroker::compile_method_base(methodHandle const&, int, int, methodHandle const&, int, CompileTask::CompileReason, bool, Thread*) [clone .part.0] (compileBroker.cpp:1208)
+#   CompileBroker::compile_method(methodHandle const&, int, int, methodHandle const&, int, CompileTask::CompileReason, DirectiveSet*, Thread*) (compileBroker.cpp:1375)
+#   CompileBroker::compile_method(methodHandle const&, int, int, methodHandle const&, int, CompileTask::CompileReason, Thread*) (compileBroker.cpp:1234)
+#   TieredThresholdPolicy::submit_compile(methodHandle const&, int, CompLevel, JavaThread*) (tieredThresholdPolicy.cpp:457)
+#   TieredThresholdPolicy::method_invocation_event(methodHandle const&, methodHandle const&, CompLevel, CompiledMethod*, JavaThread*) (tieredThresholdPolicy.cpp:897)
+#   TieredThresholdPolicy::event(methodHandle const&, methodHandle const&, int, int, CompLevel, CompiledMethod*, JavaThread*) (tieredThresholdPolicy.cpp:394)
+#   InterpreterRuntime::frequency_counter_overflow_inner(JavaThread*, unsigned char*) (interpreterRuntime.cpp:1065)
+#   InterpreterRuntime::frequency_counter_overflow(JavaThread*, unsigned char*) (interpreterRuntime.cpp:1018)
+{
+   <JVM CompileBroker::compile_method_base(methodHandle const&, int, int, methodHandle const&, int, CompileTask::CompileReason, bool, Thread*)>
+   Memcheck:Leak
+   ...
+   fun:_ZN13CompileBroker19compile_method_baseERK12methodHandleiiS2_iN11CompileTask13CompileReasonEbP6Thread.part.0
+}
+
 {
    <JVM CompileBroker::compiler_thread_loop>
    Memcheck:Leak
@@ -67,6 +92,25 @@
    fun:_ZN10HeapRegionC1EjP18G1BlockOffsetTable9MemRegion
    fun:_ZN15G1CollectedHeap15new_heap_regionEj9MemRegion
 }
+
+# In my observations, it's usually called through JNI 'GetStaticMethodID' or 'GetMethodID'.
+# JNI docs don't mention any cleanup, therefore I understand that this is some permanent cache.
+# Example stack:
+#   malloc (vg_replace_malloc.c:380)
+#   AllocateHeap (allocation.cpp:44)
+#   AllocateHeap(unsigned long, MemoryType, AllocFailStrategy::AllocFailEnum) (allocation.cpp:54)
+#   InstanceKlass::get_jmethod_id(methodHandle const&) (instanceKlass.cpp:1959)
+#   jmethod_id (method.hpp:831)
+#   get_method_id(JNIEnv_*, _jclass*, char const*, char const*, bool, Thread*) [clone .constprop.0] (jni.cpp:1364)
+#   jni_GetMethodID (jni.cpp:1372)
+#   <application>
+{
+   <JVM InstanceKlass::get_jmethod_id(methodHandle const&)>
+   Memcheck:Leak
+   ...
+   fun:_ZN13InstanceKlass14get_jmethod_idERK12methodHandle
+}
+
 {
    <JVM Java_java_lang_ClassLoader_defineClass1>
    Memcheck:Leak
@@ -85,6 +129,23 @@
    ...
    fun:Java_java_util_zip_Inflater_init
 }
+
+# Internal JVM machinery that creates a new thread.
+# Example stack:
+#   malloc (vg_replace_malloc.c:380)
+#   AllocateHeap (allocation.cpp:44)
+#   AllocateHeap(unsigned long, MemoryType, AllocFailStrategy::AllocFailEnum) (allocation.cpp:54)
+#   operator new (allocation.hpp:177)
+#   Thread::Thread() (thread.cpp:272)
+#   JavaThread::JavaThread(void (*)(JavaThread*, Thread*), unsigned long) (thread.cpp:1740)
+#   JVM_StartThread (jvm.cpp:2894)
+{
+   <JVM JavaThread::JavaThread(void (*)(JavaThread*, Thread*), unsigned long)>
+   Memcheck:Leak
+   ...
+   fun:_ZN10JavaThreadC1EPFvPS_P6ThreadEm
+}
+
 {
    <JVM JVM_AddModuleExports>
    Memcheck:Leak
@@ -103,6 +164,38 @@
    ...
    fun:JVM_DefineModule
 }
+
+# Looks like JVM internals that are unrelated to application.
+# Example stack:
+#   malloc (vg_replace_malloc.c:380)
+#   AllocateHeap(unsigned long, MemoryType, NativeCallStack const&, AllocFailStrategy::AllocFailEnum) (allocation.cpp:44)
+#   BasicHashtable<(MemoryType)1>::new_entry(unsigned int) (hashtable.cpp:68)
+#   Hashtable<InstanceKlass*, (MemoryType)1>::new_entry(unsigned int, InstanceKlass*) (hashtable.cpp:84)
+#   new_entry (loaderConstraints.cpp:49)
+#   LoaderConstraintTable::add_entry(Symbol*, InstanceKlass*, Handle, InstanceKlass*, Handle) (loaderConstraints.cpp:241)
+#   SystemDictionary::add_loader_constraint(Symbol*, Handle, Handle, Thread*) (systemDictionary.cpp:2286)
+#   SystemDictionary::check_signature_loaders(Symbol*, Handle, Handle, bool, Thread*) (systemDictionary.cpp:2388)
+#   LinkResolver::check_method_loader_constraints(LinkInfo const&, methodHandle const&, char const*, Thread*) (linkResolver.cpp:663)
+#   LinkResolver::resolve_method(LinkInfo const&, Bytecodes::Code, Thread*) (linkResolver.cpp:789)
+#   LinkResolver::linktime_resolve_static_method(LinkInfo const&, Thread*) (linkResolver.cpp:1086)
+#   LinkResolver::resolve_static_call(CallInfo&, LinkInfo const&, bool, Thread*) (linkResolver.cpp:1061)
+#   MethodHandles::resolve_MemberName(Handle, Klass*, bool, Thread*) (methodHandles.cpp:794)
+#   SystemDictionary::link_method_handle_constant(Klass*, int, Klass*, Symbol*, Symbol*, Thread*) (systemDictionary.cpp:2753)
+#   ConstantPool::resolve_constant_at_impl(constantPoolHandle const&, int, int, bool*, Thread*) (constantPool.cpp:1027)
+#   resolve_possibly_cached_constant_at (constantPool.hpp:740)
+#   ConstantPool::resolve_bootstrap_specifier_at_impl(constantPoolHandle const&, int, Thread*) (constantPool.cpp:1125)
+#   resolve_bootstrap_specifier_at (constantPool.hpp:750)
+#   LinkResolver::resolve_invokedynamic(CallInfo&, constantPoolHandle const&, int, Thread*) (linkResolver.cpp:1733)
+#   LinkResolver::resolve_invoke(CallInfo&, Handle, constantPoolHandle const&, int, Bytecodes::Code, Thread*) (linkResolver.cpp:1617)
+#   InterpreterRuntime::resolve_invokedynamic(JavaThread*) (interpreterRuntime.cpp:975)
+#   InterpreterRuntime::resolve_from_cache(JavaThread*, Bytecodes::Code) (interpreterRuntime.cpp:1004)
+{
+   <JVM LoaderConstraintTable::add_entry(Symbol*, InstanceKlass*, Handle, InstanceKlass*, Handle)>
+   Memcheck:Leak
+   ...
+   fun:_ZN21LoaderConstraintTable9add_entryEP6SymbolP13InstanceKlass6HandleS3_S4_
+}
+
 {
    <JVM Metaspace::global_initialize>
    Memcheck:Leak
@@ -151,12 +244,28 @@
    ...
    fun:_ZN11StringTableC1Ev
 }
+
+# TODO: Separate JVM's internal works from possible Java's String#intern() misuses
+# Example stack:
+#   malloc (vg_replace_malloc.c:380)
+#   AllocateHeap(unsigned long, MemoryType, NativeCallStack const&, AllocFailStrategy::AllocFailEnum) (allocation.cpp:44)
+#   OopStorage::Block::new_block(OopStorage const*) (oopStorage.cpp:320)
+#   OopStorage::allocate() (oopStorage.cpp:424)
+#   WeakHandle<(WeakHandleType)2>::create(Handle) (weakHandle.cpp:46)
+#   operator() (stringTable.cpp:341)
+#   bool ConcurrentHashTable<WeakHandle<(WeakHandleType)2>, StringTableConfig, (MemoryType)9>::internal_insert<StringTableLookupOop, StringTableCreateEntry, StringTableCreateEntry>(Thread*, StringTableLookupOop&, StringTableCreateEntry&, StringTableCreateEntry&, bool*) (concurrentHashTable.inline.hpp:900)
+#   get_insert_lazy<StringTableLookupOop, StringTableCreateEntry, StringTableCreateEntry> (concurrentHashTable.hpp:400)
+#   StringTable::do_intern(Handle, unsigned short*, int, unsigned long, Thread*) (stringTable.cpp:377)
+#   StringTable::intern(char const*, Thread*) (stringTable.cpp:308)
+#   java_lang_Class::name(Handle, Thread*) (javaClasses.cpp:1353)
+#   JVM_InitClassName (jvm.cpp:1048)
 {
-   <JVM StringTable::intern>
+   <JVM StringTable::do_intern(Handle, unsigned short*, int, unsigned long, Thread*)>
    Memcheck:Leak
    ...
-   fun:_ZN11StringTable6internEP6SymbolP6Thread
+   fun:_ZN11StringTable9do_internE6HandlePtimP6Thread
 }
+
 {
    <JVM SymbolTable::initialize_symbols>
    Memcheck:Leak
@@ -175,12 +284,95 @@
    ...
    fun:_ZN11SymbolTable9basic_addEP15ClassLoaderDataRK18constantPoolHandleiPPKcPiS8_PjP6Thread
 }
+
+# No matter what happens during class loading, it shouldn't be pointing to
+# anything wrong in the application. Just ignore everything.
+# Example stack:
+#   malloc (vg_replace_malloc.c:380)
+#   AllocateHeap (allocation.cpp:44)
+#   AllocateHeap(unsigned long, MemoryType, AllocFailStrategy::AllocFailEnum) (allocation.cpp:54)
+#   allocate (ptrQueue.cpp:84)
+#   allocate_buffer (ptrQueue.cpp:138)
+#   handle_zero_index (ptrQueue.cpp:202)
+#   PtrQueue::enqueue_known_active(void*) (ptrQueue.cpp:66)
+#   store_at (accessBackend.hpp:489)
+#   store_at<573526, oopDesc*> (accessBackend.hpp:742)
+#   store_at<524292, oopDesc*> (accessBackend.hpp:1196)
+#   oop_store_at<oopDesc*> (access.hpp:191)
+#   obj_field_put (oop.inline.hpp:294)
+#   set_init_lock (javaClasses.cpp:1314)
+#   java_lang_Class::restore_archived_mirror(Klass*, Handle, Handle, Handle, Thread*) (javaClasses.cpp:1238)
+#   Klass::restore_unshareable_info(ClassLoaderData*, Handle, Thread*) (klass.cpp:549)
+#   InstanceKlass::restore_unshareable_info(ClassLoaderData*, Handle, Thread*) (instanceKlass.cpp:2357)
+#   SystemDictionary::load_shared_class(InstanceKlass*, Handle, Handle, Thread*) (systemDictionary.cpp:1350)
+#   SystemDictionary::load_instance_class(Symbol*, Handle, Thread*) (systemDictionary.cpp:1469)
+#   SystemDictionary::resolve_instance_class_or_null(Symbol*, Handle, Handle, Thread*) (systemDictionary.cpp:822)
+#   resolve_or_null (systemDictionary.cpp:257)
+#   SystemDictionary::resolve_or_fail(Symbol*, Handle, Handle, bool, Thread*) (systemDictionary.cpp:199)
+#   ConstantPool::klass_at_impl(constantPoolHandle const&, int, bool, Thread*) (constantPool.cpp:482)
+#   klass_at (constantPool.hpp:382)
+#   InterpreterRuntime::_new(JavaThread*, ConstantPool*, int) (interpreterRuntime.cpp:218)
+{
+   <JVM SystemDictionary::load_instance_class(Symbol*, Handle, Thread*)>
+   Memcheck:Leak
+   ...
+   fun:_ZN16SystemDictionary19load_instance_classEP6Symbol6HandleP6Thread
+}
+
+# Looks like JVM internals that are unrelated to application.
+# Example stack:
+#   malloc (vg_replace_malloc.c:380)
+#   AllocateHeap (allocation.cpp:44)
+#   AllocateHeap(unsigned long, MemoryType, AllocFailStrategy::AllocFailEnum) (allocation.cpp:54)
+#   allocate (ptrQueue.cpp:84)
+#   allocate_buffer (ptrQueue.cpp:138)
+#   handle_zero_index (ptrQueue.cpp:202)
+#   PtrQueue::enqueue_known_active(void*) (ptrQueue.cpp:66)
+#   store_at (accessBackend.hpp:489)
+#   store_at<573526, oopDesc*> (accessBackend.hpp:742)
+#   store_at<524292, oopDesc*> (accessBackend.hpp:1196)
+#   oop_store_at<oopDesc*> (access.hpp:191)
+#   obj_field_put (oop.inline.hpp:294)
+#   set_init_lock (javaClasses.cpp:1314)
+#   java_lang_Class::restore_archived_mirror(Klass*, Handle, Handle, Handle, Thread*) (javaClasses.cpp:1238)
+#   Klass::restore_unshareable_info(ClassLoaderData*, Handle, Thread*) (klass.cpp:549)
+#   InstanceKlass::restore_unshareable_info(ClassLoaderData*, Handle, Thread*) (instanceKlass.cpp:2357)
+#   SystemDictionary::load_shared_class(InstanceKlass*, Handle, Handle, Thread*) (systemDictionary.cpp:1350)
+#   SystemDictionary::load_instance_class(Symbol*, Handle, Thread*) (systemDictionary.cpp:1469)
+#   SystemDictionary::resolve_instance_class_or_null(Symbol*, Handle, Handle, Thread*) (systemDictionary.cpp:822)
+#   resolve_or_null (systemDictionary.cpp:257)
+#   SystemDictionary::resolve_or_fail(Symbol*, Handle, Handle, bool, Thread*) (systemDictionary.cpp:199)
+#   ConstantPool::klass_at_impl(constantPoolHandle const&, int, bool, Thread*) (constantPool.cpp:482)
+#   klass_at (constantPool.hpp:382)
+#   InterpreterRuntime::_new(JavaThread*, ConstantPool*, int) (interpreterRuntime.cpp:218)
+{
+   <JVM SystemDictionary::resolve_instance_class_or_null(Symbol*, Handle, Handle, Thread*)>
+   Memcheck:Leak
+   ...
+   fun:_ZN16SystemDictionary30resolve_instance_class_or_nullEP6Symbol6HandleS2_P6Thread
+}
+
 {
    <JVM SystemDictionary::resolve_well_known_classes>
    Memcheck:Leak
    ...
    fun:_ZN16SystemDictionary26resolve_well_known_classesEP6Thread
 }
+
+# Internal JVM machinery that creates a new thread.
+# Example stack:
+#   malloc (vg_replace_malloc.c:380)
+#   AllocateHeap(unsigned long, MemoryType, NativeCallStack const&, AllocFailStrategy::AllocFailEnum) (allocation.cpp:44)
+#   Thread::allocate(unsigned long, bool, MemoryType) (thread.cpp:181)
+#   operator new (thread.hpp:184)
+#   JVM_StartThread (jvm.cpp:2894)
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   ...
+   fun:_ZN6Thread8allocateEmb10MemoryType
+}
+
 {
    <JVM Threads::create_vm>
    Memcheck:Leak

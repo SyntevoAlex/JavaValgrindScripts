@@ -1,0 +1,34 @@
+# One-time GLib initializers for IBus classes like:
+# G_DEFINE_TYPE_WITH_PRIVATE (IBusInputContext, ibus_input_context, IBUS_TYPE_PROXY)
+# Example stack:
+#   realloc (vg_replace_malloc.c:1192)
+#   g_realloc (gmem.c:167)
+#   g_signal_newv (gsignal.c:1796)
+#   g_signal_new_valist (gsignal.c:1988)
+#   g_signal_new (gsignal.c:1517)
+#   ibus_input_context_class_init (ibusinputcontext.c:481)
+#   ibus_input_context_class_intern_init (ibusinputcontext.c:86)
+#   type_class_init_Wm (gtype.c:2236)
+#   g_type_class_ref (gtype.c:2951)
+#   g_object_new_valist (gobject.c:2214)
+#   g_async_initable_new_valist_async (gasyncinitable.c:430)
+#   g_async_initable_new_async (gasyncinitable.c:343)
+#   ibus_input_context_new_async (ibusinputcontext.c:780)
+#   _create_input_context_async_step_one_done (ibusbus.c:947)
+#   g_task_return_now (gtask.c:1214)
+#   g_task_return.part.0 (gtask.c:1283)
+#   g_dbus_connection_call_done (gdbusconnection.c:5764)
+#   g_task_return_now (gtask.c:1214)
+#   complete_in_idle_cb (gtask.c:1228)
+#   g_main_dispatch (gmain.c:3309)
+#   g_main_context_dispatch (gmain.c:3974)
+#   g_main_context_iterate.isra.0 (gmain.c:4047)
+#   g_main_context_iteration (gmain.c:4108)
+#   gtk_main_iteration_do (gtkmain.c:1456)
+{
+   <ibus ibus_input_context_class_init>
+   Memcheck:Leak
+   ...
+   fun:ibus_*_class_init
+}
+

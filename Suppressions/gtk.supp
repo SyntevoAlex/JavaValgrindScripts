@@ -1,3 +1,13 @@
+# Most leak stacks from 'get_xkb()' also contain 'XkbGetMap()'. The correct
+# way to free it is 'XkbFreeClientMap()', but GTK has no mentions of it. I
+# therefore understand that this is supposed to be cached forever in GTK.
+{
+   <GTK get_xkb>
+   Memcheck:Leak
+   ...
+   fun:get_xkb
+}
+
 # Ignore everything that happens in massive inializers.
 # For example, GTK will load theme's XML there, which causes thousands of
 # allocations that won't go away.
