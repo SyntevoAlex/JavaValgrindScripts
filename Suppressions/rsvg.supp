@@ -1,0 +1,13 @@
+{
+   <RSVG call_once<closure-0>>
+   Memcheck:Leak
+   ...
+   fun:call_once<closure-0>
+}
+{
+   <RSVG call_once<closure-0,()>>
+   Memcheck:Leak
+   ...
+   fun:call_once<closure-0,()>
+}
+

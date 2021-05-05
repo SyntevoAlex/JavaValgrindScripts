@@ -1,0 +1,19 @@
+{
+   <GLib g_intern_string>
+   Memcheck:Leak
+   ...
+   fun:g_intern_string
+}
+{
+   <GLib g_type_add_interface_static>
+   Memcheck:Leak
+   ...
+   fun:g_type_add_interface_static
+}
+{
+   <GLib g_type_register_static>
+   Memcheck:Leak
+   ...
+   fun:g_type_register_static
+}
+

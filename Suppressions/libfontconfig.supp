@@ -1,0 +1,7 @@
+{
+   <Libfontconfg FcConfigEnsure>
+   Memcheck:Leak
+   ...
+   fun:FcConfigEnsure
+}
+

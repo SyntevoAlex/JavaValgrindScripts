@@ -205,9 +205,4 @@
    ...
    fun:canonicalize_disableintrinsic
 }
-{
-   <GLIBC globals>
-   Memcheck:Leak
-   ...
-   fun:dlopen@@GLIBC_2.2.5
-}
+
