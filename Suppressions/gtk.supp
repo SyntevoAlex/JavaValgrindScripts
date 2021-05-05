@@ -1,33 +1,165 @@
+# Ignore everything that happens in massive inializers.
+# For example, GTK will load theme's XML there, which causes thousands of
+# allocations that won't go away.
+# Example stack:
+#   realloc (vg_replace_malloc.c:1192)
+#   g_realloc (gmem.c:167)
+#   g_array_maybe_expand (garray.c:962)
+#   g_array_append_vals (garray.c:479)
+#   css_provider_commit (gtkcssprovider.c:933)
+#   parse_ruleset (gtkcssprovider.c:1633)
+#   parse_statement (gtkcssprovider.c:1644)
+#   parse_stylesheet (gtkcssprovider.c:1660)
+#   gtk_css_provider_load_internal (gtkcssprovider.c:1787)
+#   parse_import (gtkcssprovider.c:1053)
+#   parse_at_keyword (gtkcssprovider.c:1301)
+#   parse_statement (gtkcssprovider.c:1642)
+#   parse_stylesheet (gtkcssprovider.c:1660)
+#   gtk_css_provider_load_internal (gtkcssprovider.c:1787)
+#   gtk_css_provider_load_from_file (gtkcssprovider.c:1890)
+#   gtk_css_provider_load_from_path (gtkcssprovider.c:1924)
+#   _gtk_css_provider_load_named (gtkcssprovider.c:2166)
+#   settings_update_theme (gtksettings.c:3309)
+#   settings_init_style (gtksettings.c:1899)
+#   gtk_settings_create_for_display (gtksettings.c:1985)
+#   gtk_settings_get_for_display (gtksettings.c:2017)
+#   display_opened_cb (gtkmodules.c:498)
+#   g_cclosure_marshal_VOID__OBJECTv (gmarshal.c:1910)
+#   _g_closure_invoke_va (gclosure.c:873)
+#   g_signal_emit_valist (gsignal.c:3408)
+#   g_signal_emit (gsignal.c:3555)
+#   _g_closure_invoke_va (gclosure.c:873)
+#   g_signal_emit_valist (gsignal.c:3408)
+#   g_signal_emit_by_name (gsignal.c:3595)
+#   _gdk_x11_display_open (gdkdisplay-x11.c:1803)
 {
-   <GTK gtk_css_provider_load_from_path>
+   <GTK gtk_settings_create_for_display>
    Memcheck:Leak
    ...
-   fun:gtk_css_provider_load_from_path
+   fun:gtk_settings_create_for_display
 }
-{
-   <GTK gtk_css_provider_load_internal>
-   Memcheck:Leak
-   ...
-   fun:gtk_css_provider_load_internal
-}
+
+# gtk_im_module_initialize() is an internal one-time initializer in GTK
+# that allocates various permanent global variables.
+# Example stack:
+#   malloc (vg_replace_malloc.c:380)
+#   g_malloc (gmem.c:102)
+#   g_slice_alloc (gslice.c:1025)
+#   g_slice_alloc0 (gslice.c:1051)
+#   g_type_create_instance (gtype.c:1850)
+#   g_object_new_internal (gobject.c:1937)
+#   g_object_new_with_properties (gobject.c:2105)
+#   g_object_new (gobject.c:1777)
+#   gtk_im_module_initialize (gtkimmodule.c:448)
+#   _gtk_im_module_get_default_context_id (gtkimmodule.c:841)
+#   get_effective_context_id (gtkimmulticontext.c:260)
+#   get_effective_context_id (gtkimmulticontext.c:252)
+#   gtk_im_multicontext_get_slave (gtkimmulticontext.c:270)
+#   gtk_im_multicontext_get_preedit_string (gtkimmulticontext.c:343)
+#   gtk_im_context_get_preedit_string (gtkimcontext.c:496)
+#   gtk_entry_create_layout (gtkentry.c:6365)
+#   gtk_entry_ensure_layout (gtkentry.c:6457)
+#   gtk_entry_get_cursor_locations.constprop.0 (gtkentry.c:6888)
+#   update_im_cursor_location (gtkentry.c:6254)
+#   gtk_entry_recompute (gtkentry.c:6285)
+#   g_cclosure_marshal_VOID__OBJECTv (gmarshal.c:1910)
+#   _g_closure_invoke_va (gclosure.c:873)
+#   g_signal_emit_valist (gsignal.c:3408)
+#   g_signal_emit (gsignal.c:3555)
 {
    <GTK gtk_im_module_initialize>
    Memcheck:Leak
    ...
    fun:gtk_im_module_initialize
 }
+
+# gtk_init_check() is another large-scale one-time initializer.
+# For simplicity, let's just ignore anything it does.
+# Example stack:
+#   malloc (vg_replace_malloc.c:380)
+#   XRenderQueryFormats (Xrender.c:468)
+#   XRenderQueryVersion (Xrender.c:333)
+#   _XcursorGetDisplayInfo (display.c:144)
+#   _XcursorGetDisplayInfo (display.c:96)
+#   XcursorGetTheme (display.c:351)
+#   gdk_x11_display_set_cursor_theme (gdkcursor-x11.c:475)
+#   settings_update_cursor_theme (gtksettings.c:3052)
+#   gtk_settings_create_for_display (gtksettings.c:1989)
+#   gtk_settings_get_for_display (gtksettings.c:2017)
+#   display_opened_cb (gtkmodules.c:498)
+#   g_cclosure_marshal_VOID__OBJECTv (gmarshal.c:1910)
+#   _g_closure_invoke_va (gclosure.c:873)
+#   g_signal_emit_valist (gsignal.c:3408)
+#   g_signal_emit (gsignal.c:3555)
+#   _g_closure_invoke_va (gclosure.c:873)
+#   g_signal_emit_valist (gsignal.c:3408)
+#   g_signal_emit_by_name (gsignal.c:3595)
+#   _gdk_x11_display_open (gdkdisplay-x11.c:1803)
+#   gdk_display_manager_open_display (gdkdisplaymanager.c:462)
+#   gtk_init_check (gtkmain.c:1109)
+#   gtk_init_check (gtkmain.c:1101)
 {
    <GTK gtk_init_check>
    Memcheck:Leak
    ...
    fun:gtk_init_check
 }
+
+# gtk_test_register_all_types() is another one-time initializer.
+# Example stack:
+#   realloc (vg_replace_malloc.c:1192)
+#   g_realloc (gmem.c:167)
+#   type_set_qdata_W (gtype.c:3737)
+#   type_iface_add_prerequisite_W (gtype.c:1536)
+#   g_type_interface_add_prerequisite (gtype.c:1620)
+#   gtk_tree_sortable_get_type (gtktreesortable.c:63)
+#   gtk_list_store_get_type_once (gtkliststore.c:298)
+#   gtk_list_store_get_type (gtkliststore.c:298)
+#   gtk_test_register_all_types (gtktypefuncs.inc:304)
+#   gtk_builder_real_get_type_from_name (gtkbuilder.c:443)
+#   gtk_builder_real_get_type_from_name (gtkbuilder.c:430)
+#   gtk_builder_get_type_from_name (gtkbuilder.c:2410)
+#   parse_object (gtkbuilderparser.c:289)
+#   start_element (gtkbuilderparser.c:962)
+#   emit_start_element (gmarkup.c:1064)
+#   g_markup_parse_context_parse (gmarkup.c:1423)
+#   _gtk_builder_parser_parse_buffer (gtkbuilderparser.c:1261)
+#   gtk_builder_extend_with_template (gtkbuilder.c:1178)
+#   gtk_widget_init_template (gtkwidget.c:17024)
+#   gtk_tooltip_window_init (gtktooltipwindow.c:80)
+#   g_type_create_instance (gtype.c:1868)
+#   g_object_new_internal (gobject.c:1937)
+#   g_object_new_valist (gobject.c:2262)
 {
    <GTK gtk_test_register_all_types>
    Memcheck:Leak
    ...
    fun:gtk_test_register_all_types
 }
+
+# gtk_*_class_init() are internal GLib initializers for GTK classes.
+# These are called automatically on the first use of class, such as g_object_new().
+# Example stack
+#   realloc (vg_replace_malloc.c:1192)
+#   g_realloc (gmem.c:167)
+#   g_hash_table_realloc_key_or_value_array (ghash.c:380)
+#   realloc_arrays (ghash.c:723)
+#   g_hash_table_resize (ghash.c:876)
+#   g_hash_table_maybe_resize (ghash.c:916)
+#   g_hash_table_insert_node (ghash.c:1342)
+#   g_hash_table_insert_internal (ghash.c:1601)
+#   g_param_spec_pool_insert (gparam.c:968)
+#   install_property_internal (gobject.c:580)
+#   install_property_internal (gobject.c:566)
+#   validate_and_install_class_property (gobject.c:617)
+#   validate_and_install_class_property (gobject.c:602)
+#   g_object_class_install_properties (gobject.c:770)
+#   gtk_entry_class_init (gtkentry.c:1549)
+#   gtk_entry_class_intern_init (gtkentry.c:731)
+#   type_class_init_Wm (gtype.c:2236)
+#   g_type_class_ref (gtype.c:2951)
+#   g_object_new_with_properties (gobject.c:2075)
+#   g_object_new (gobject.c:1777)
 {
    <GTK gtk_*_class_init>
    Memcheck:Leak

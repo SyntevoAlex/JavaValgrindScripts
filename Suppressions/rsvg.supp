@@ -1,13 +1,65 @@
+# RSVG gets involved whenever GTK deals with SVG images.
+# One example is 'Yaru' theme on Ubuntu which has SVG images for checkboxes.
+# Just like the name implies, 'call_once' are various one-time initializers.
+# Example stack:
+#   calloc (vg_replace_malloc.c:1117)
+#   UnknownInlinedFun (alloc.rs:162)
+#   UnknownInlinedFun (alloc.rs:209)
+#   allocate_in<usize,alloc::alloc::Global> (raw_vec.rs:87)
+#   with_capacity_zeroed<usize> (raw_vec.rs:147)
+#   from_elem<usize> (vec.rs:1765)
+#   from_elem<usize> (vec.rs:1730)
+#   __static_ref_initialize (dynamic_set.rs:45)
+#   call_once<fn() -> std::sync::mutex::Mutex<string_cache::dynamic_set::Set>,()> (function.rs:232)
+#   {{closure}}<std::sync::mutex::Mutex<string_cache::dynamic_set::Set>,fn() -> std::sync::mutex::Mutex<string_cache::dynamic_set::Set>> (inline_lazy.rs:31)
+#   std::sync::once::Once::call_once::{{closure}} (once.rs:264)
+#   std::sync::once::Once::call_inner (once.rs:416)
+#   call_once<closure-0> (once.rs:264)
+#   get<std::sync::mutex::Mutex<string_cache::dynamic_set::Set>,fn() -> std::sync::mutex::Mutex<string_cache::dynamic_set::Set>> (inline_lazy.rs:30)
+#   __stability (<::lazy_static::__lazy_static_internal macros>:16)
+#   <string_cache::dynamic_set::DYNAMIC_SET as core::ops::deref::Deref>::deref (<::lazy_static::__lazy_static_internal macros>:18)
+#   <string_cache::atom::Atom<Static> as core::convert::From<alloc::borrow::Cow<str>>>::from (atom.rs:194)
+#   UnknownInlinedFun (trivial_impls.rs:48)
+#   call_once<fn(&str) -> string_cache::atom::Atom<markup5ever::PrefixStaticSet>,(&str)> (function.rs:232)
+#   map<&str,string_cache::atom::Atom<markup5ever::PrefixStaticSet>,fn(&str) -> string_cache::atom::Atom<markup5ever::PrefixStaticSet>> (option.rs:456)
+#   rsvg_internals::property_bag::PropertyBag::new_from_xml2_attributes (property_bag.rs:63)
+#   rsvg_internals::xml2_load::sax_start_element_ns_cb (xml2_load.rs:218)
+#   xmlParseStartTag2 (parser.c:9589)
+#   xmlParseElementStart (parser.c:9962)
+#   xmlParseElement__internal_alias (parser.c:9910)
+#   xmlParseDocument (parser.c:10748)
+#   rsvg_internals::xml2_load::Xml2Parser::parse (xml2_load.rs:450)
+#   {{closure}} (xml.rs:590)
+#   and_then<alloc::boxed::Box<rsvg_internals::xml2_load::Xml2Parser>,rsvg_internals::error::LoadingError,(),closure-0> (result.rs:727)
+#   rsvg_internals::xml::XmlState::parse_from_stream (xml.rs:589)
+#   build_document (xml.rs:603)
+#   rsvg_internals::xml::xml_load_from_possibly_compressed_stream (xml.rs:701)
+#   rsvg_internals::document::Document::load_from_stream (document.rs:55)
+#   rsvg_internals::handle::Handle::from_stream (handle.rs:94)
+#   rsvg_c_api::c_api::CHandle::read_stream (c_api.rs:743)
+#   close (c_api.rs:709)
+#   rsvg_rust_handle_close (c_api.rs:1285)
+#   gdk_pixbuf__svg_image_stop_load (io-svg.c:160)
+#   gdk_pixbuf_loader_close (gdk-pixbuf-loader.c:846)
+#   load_from_stream (gdkpixbufutils.c:54)
+#   _gdk_pixbuf_new_from_stream_scaled (gdkpixbufutils.c:104)
+#   _gdk_pixbuf_new_from_resource_scaled (gdkpixbufutils.c:127)
+#   icon_info_ensure_scale_and_pixbuf (gtkicontheme.c:3924)
+#   icon_info_ensure_scale_and_pixbuf (gtkicontheme.c:3854)
+#   gtk_icon_info_load_symbolic_svg (gtkicontheme.c:4528)
+#   gtk_icon_info_load_symbolic_internal (gtkicontheme.c:4658)
+#   gtk_css_image_recolor_load (gtkcssimagerecolor.c:118)
+#   gtk_css_image_recolor_compute (gtkcssimagerecolor.c:170)
+#   gtk_css_image_fallback_compute (gtkcssimagefallback.c:149)
+#   gtk_css_image_fallback_compute (gtkcssimagefallback.c:132)
+#   gtk_css_value_image_compute (gtkcssimagevalue.c:50)
+#   gtk_css_static_style_compute_value (gtkcssstaticstyle.c:237)
+#   _gtk_css_lookup_resolve (gtkcsslookup.c:122)
+#   gtk_css_static_style_new_compute (gtkcssstaticstyle.c:195)
 {
    <RSVG call_once<closure-0>>
    Memcheck:Leak
    ...
-   fun:call_once<closure-0>
-}
-{
-   <RSVG call_once<closure-0,()>>
-   Memcheck:Leak
-   ...
-   fun:call_once<closure-0,()>
+   fun:call_once<*>
 }
 

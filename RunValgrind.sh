@@ -43,9 +43,12 @@ VALGRIND_ARGS+=(--show-leak-kinds=all)
 # Not sure if this is actually needed
 VALGRIND_ARGS+=(--smc-check=all)
 
-# Capture longer stacks, because GTK tends to have pretty long stacks.
-# With shorter stacks, the code that called GTK will not be visible.
-VALGRIND_ARGS+=(--num-callers=20)
+# GTK and fontconfig tend to have pretty long stacks.
+# Increase the number of callers captured in call stacks to reliably suppress
+# false positives and give more information for actual leaks. The downside is
+# that found leaks with the same culprit will tend to break into many smaller
+# groups.
+VALGRIND_ARGS+=(--num-callers=30)
 
 # JVM's stack probe (AbstractAssembler::generate_stack_overflow_check()) causes
 # valgrind to be upset with thousands of writes that are seemingly below current

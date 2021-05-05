@@ -1,7 +1,0 @@
-{
-   <XLib _XEnq>
-   Memcheck:Leak
-   fun:malloc
-   fun:_XEnq
-}
-

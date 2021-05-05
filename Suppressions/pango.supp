@@ -1,3 +1,45 @@
+# Pango caches glyph extents in 'PangoCairoFontPrivate::glyph_extents_cache'.
+# I understand that GTK never releases at least the system font, hence this
+# cache becomes a leak. Just ignore it, hopefully it doesn't hide any problems
+# that won't be indicated by other leaks.
+# Example stack
+#   malloc (vg_replace_malloc.c:380)
+#   _cairo_scaled_font_allocate_glyph (cairo-scaled-font.c:2878)
+#   _cairo_scaled_glyph_lookup (cairo-scaled-font.c:3007)
+#   cairo_scaled_font_glyph_extents (cairo-scaled-font.c:1611)
+#   compute_glyph_extents (pangocairo-font.c:840)
+#   _pango_cairo_font_private_get_glyph_extents_cache_entry (pangocairo-font.c:863)
+#   _pango_cairo_font_private_get_glyph_extents (pangocairo-font.c:900)
+#   pango_glyph_string_extents_range (glyphstring.c:211)
+#   pango_layout_run_get_extents_and_height.isra.0 (pango-layout.c:4905)
+#   pango_layout_line_get_extents_and_height (pango-layout.c:5075)
+#   get_line_extents_layout_coords (pango-layout.c:2575)
+#   pango_layout_get_extents_internal (pango-layout.c:2699)
+#   _pango_cairo_font_get_metrics (pangocairo-font.c:322)
+#   pango_layout_get_empty_extents_at_index.part.0 (pango-layout.c:4840)
+#   pango_layout_get_empty_extents_at_index (pango-layout.c:4787)
+#   pango_layout_line_get_empty_extents (pango-layout.c:4875)
+#   pango_layout_line_get_extents_and_height (pango-layout.c:5122)
+#   get_line_extents_layout_coords (pango-layout.c:2575)
+#   pango_layout_get_extents_internal (pango-layout.c:2699)
+#   _pango_layout_get_iter (pango-layout.c:6129)
+#   pango_layout_index_to_line_and_extents (pango-layout.c:1744)
+#   pango_layout_get_cursor_pos (pango-layout.c:2379)
+#   gtk_entry_get_cursor_locations.constprop.0 (gtkentry.c:6913)
+#   update_im_cursor_location (gtkentry.c:6254)
+#   gtk_entry_recompute (gtkentry.c:6285)
+#   g_cclosure_marshal_VOID__OBJECTv (gmarshal.c:1910)
+#   _g_closure_invoke_va (gclosure.c:873)
+#   g_signal_emit_valist (gsignal.c:3408)
+#   g_signal_emit (gsignal.c:3555)
+#   gtk_widget_propagate_hierarchy_changed_recurse (gtkwidget.c:9996)
+#   _gtk_widget_propagate_hierarchy_changed (gtkwidget.c:10037)
+#   gtk_widget_set_parent (gtkwidget.c:9653)
+#   gtk_bin_add (gtkbin.c:135)
+#   g_cclosure_marshal_VOID__OBJECTv (gmarshal.c:1910)
+#   _g_closure_invoke_va (gclosure.c:873)
+#   g_signal_emit_valist (gsignal.c:3408)
+#   g_signal_emit (gsignal.c:3555)
 {
    <Pango _pango_cairo_font_private_get_glyph_extents_cache_entry>
    Memcheck:Leak

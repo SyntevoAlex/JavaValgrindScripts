@@ -1,0 +1,50 @@
+# 'FcConfigEnsure()' initializes a global variable '_fcConfig' in 'fontconfig'.
+# Example stack:
+#   malloc (vg_replace_malloc.c:380)
+#   strdup (strdup.c:42)
+#   FcExprCreateString (fcxml.c:131)
+#   FcParseFamily (fcxml.c:1745)
+#   FcEndElement (fcxml.c:2999)
+#   doContent (xmlparse.c:2845)
+#   contentProcessor (xmlparse.c:2445)
+#   doProlog (xmlparse.c:4371)
+#   prologProcessor (xmlparse.c:4094)
+#   XML_ParseBuffer (xmlparse.c:1893)
+#   XML_ParseBuffer (xmlparse.c:1863)
+#   FcConfigParseAndLoadFromMemoryInternal (fcxml.c:3358)
+#   _FcConfigParse (fcxml.c:3491)
+#   FcConfigParseAndLoadDir (fcxml.c:3256)
+#   _FcConfigParse (fcxml.c:3454)
+#   FcParseInclude (fcxml.c:2421)
+#   FcEndElement (fcxml.c:2971)
+#   doContent (xmlparse.c:2845)
+#   contentProcessor (xmlparse.c:2445)
+#   doProlog (xmlparse.c:4371)
+#   prologProcessor (xmlparse.c:4094)
+#   XML_ParseBuffer (xmlparse.c:1893)
+#   XML_ParseBuffer (xmlparse.c:1863)
+#   FcConfigParseAndLoadFromMemoryInternal (fcxml.c:3358)
+#   _FcConfigParse (fcxml.c:3491)
+#   FcInitLoadOwnConfig (fcinit.c:88)
+#   FcInitLoadOwnConfigAndFonts (fcinit.c:169)
+#   FcConfigEnsure (fccfg.c:45)
+#   IA__FcConfigGetCurrent (fccfg.c:524)
+#   FcConfigSubstituteWithPat (fccfg.c:1575)
+#   pango_cairo_fc_font_map_fontset_key_substitute (pangocairo-fcfontmap.c:106)
+#   pango_fc_default_substitute (pangofc-fontmap.c:1685)
+#   pango_fc_font_map_get_patterns (pangofc-fontmap.c:1740)
+#   pango_fc_font_map_load_fontset (pangofc-fontmap.c:1844)
+#   itemize_state_update_for_new_run (pango-context.c:1407)
+#   itemize_state_process_run (pango-context.c:1431)
+#   pango_itemize_with_base_dir (pango-context.c:1575)
+#   pango_layout_check_lines (pango-layout.c:4279)
+#   pango_layout_check_lines (pango-layout.c:4175)
+#   pango_layout_get_unknown_glyphs_count (pango-layout.c:1291)
+#   find_invisible_char (gtkentry.c:2763)
+{
+   <fontconfg FcConfigEnsure>
+   Memcheck:Leak
+   ...
+   fun:FcConfigEnsure
+}
+

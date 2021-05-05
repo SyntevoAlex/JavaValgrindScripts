@@ -1,0 +1,9 @@
+# When a block allocated by '_XEnq' is no longer needed, it's not freed but
+# instead cached in 'Display::qfree'. This makes it look like a leak.
+{
+   <libx11 _XEnq>
+   Memcheck:Leak
+   fun:malloc
+   fun:_XEnq
+}
+
