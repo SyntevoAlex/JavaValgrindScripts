@@ -1,6 +1,0 @@
-{
-   <GLib g_intern_string>
-   Memcheck:Leak
-   ...
-   fun:g_intern_string
-}
