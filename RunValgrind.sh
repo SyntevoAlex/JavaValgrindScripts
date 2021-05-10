@@ -9,9 +9,10 @@
 #    d) make
 #    e) sudo make install
 # 1) Compose your full java commandline as usual
-# 2) Prepend this script's path to the java's commandline
-# 3) Run. Note that it usually takes some 2 minutes for Java to start under valgrind.
-# 4) Find a copy of valgrind's output in a new file near this script
+# 2) Add -Xint to Java commanline. Valgrind is not very happy with JIT.
+# 3) Prepend this script's path to the java's commandline
+# 4) Run. Note that it usually takes some 2 minutes for Java to start under valgrind.
+# 5) Find a copy of valgrind's output in a new file near this script
 
 SCRIPT_DIR=`dirname "$0"`
 
